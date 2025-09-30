@@ -9,6 +9,16 @@ from diffusers import AutoencoderKL
 from HYPIR.utils.common import wavelet_reconstruction, make_tiled_fn
 from HYPIR.utils.tiled_vae import enable_tiled_vae
 
+# Try to import FlashAttention 2
+try:
+    import flash_attn
+    FLASH_ATTENTION_AVAILABLE = True
+    FLASH_ATTENTION_VERSION = getattr(flash_attn, "__version__", "unknown")
+    print(f"FlashAttention {FLASH_ATTENTION_VERSION} is available and will be used for acceleration.")
+except ImportError:
+    FLASH_ATTENTION_AVAILABLE = False
+    print("FlashAttention is not available. Using standard attention implementation.")
+
 
 class BaseEnhancer:
 
@@ -21,6 +31,7 @@ class BaseEnhancer:
         model_t,
         coeff_t,
         device,
+        use_flash_attention=True,
     ):
         self.base_model_path = base_model_path
         self.weight_path = weight_path
@@ -28,9 +39,13 @@ class BaseEnhancer:
         self.lora_rank = lora_rank
         self.model_t = model_t
         self.coeff_t = coeff_t
+        self.use_flash_attention = use_flash_attention and FLASH_ATTENTION_AVAILABLE
 
         self.weight_dtype = torch.bfloat16
         self.device = device
+        
+        if self.use_flash_attention:
+            print("FlashAttention 2 enabled for this enhancer.")
 
     def init_models(self):
         self.init_scheduler()

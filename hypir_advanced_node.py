@@ -46,6 +46,7 @@ class HYPIRAdvancedRestoration:
                 "encode_patch_size": ("INT", {"default": 512, "min": 256, "max": 1024, "step": 64}),
                 "decode_patch_size": ("INT", {"default": 512, "min": 256, "max": 1024, "step": 64}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 8, "step": 1}),
+                "use_flash_attention": ("BOOLEAN", {"default": HYPIR_CONFIG.get("use_flash_attention", True)}),
                 "unload_model_after": ("BOOLEAN", {"default": False}),
             },
         }
@@ -58,7 +59,7 @@ class HYPIRAdvancedRestoration:
         self.hypir = None
         self.current_config = None
     
-    def create_enhancer(self, model_name, base_model_path, model_t, coeff_t, lora_rank):
+    def create_enhancer(self, model_name, base_model_path, model_t, coeff_t, lora_rank, use_flash_attention=True):
         """Create HYPIR enhancer with custom parameters"""
         # Get model path from model name
         weight_path = get_hypir_model_path(model_name)
@@ -101,6 +102,7 @@ class HYPIRAdvancedRestoration:
                 model_t=model_t,
                 coeff_t=coeff_t,
                 device="cuda" if torch.cuda.is_available() else "cpu",
+                use_flash_attention=use_flash_attention,
             )
             enhancer.init_models()
             return enhancer
@@ -110,7 +112,8 @@ class HYPIRAdvancedRestoration:
     
     def restore_image_advanced(self, image, prompt, upscale_factor, seed, model_name, 
                              base_model_path, model_t, coeff_t, lora_rank, patch_size,
-                             encode_patch_size, decode_patch_size, batch_size, unload_model_after=False):
+                             encode_patch_size, decode_patch_size, batch_size, use_flash_attention=True, 
+                             unload_model_after=False):
         # Set seed if provided
         if seed != -1:
             torch.manual_seed(seed)
@@ -120,12 +123,13 @@ class HYPIRAdvancedRestoration:
         # Check if we need to create a new enhancer
         # 使用新的基础模型路径获取函数
         actual_base_model_path = get_base_model_path(base_model_path)
-        current_config = (model_name, actual_base_model_path, model_t, coeff_t, lora_rank)
+        current_config = (model_name, actual_base_model_path, model_t, coeff_t, lora_rank, use_flash_attention)
         if self.hypir is None or self.current_config != current_config:
             try:
-                self.hypir = self.create_enhancer(model_name, actual_base_model_path, model_t, coeff_t, lora_rank)
+                self.hypir = self.create_enhancer(model_name, actual_base_model_path, model_t, coeff_t, lora_rank, use_flash_attention)
                 self.current_config = current_config
-                print(f"HYPIR model loaded with custom parameters: model_t={model_t}, coeff_t={coeff_t}, lora_rank={lora_rank}")
+                flash_status = "enabled" if use_flash_attention else "disabled"
+                print(f"HYPIR model loaded with custom parameters: model_t={model_t}, coeff_t={coeff_t}, lora_rank={lora_rank}, FlashAttention={flash_status}")
             except Exception as e:
                 return (image, f"Error loading model: {str(e)}")
         
@@ -185,7 +189,8 @@ class HYPIRAdvancedRestoration:
                 # Convert back to ComfyUI format
                 output_image = result.squeeze(0).permute(1, 2, 0)  # (C, H, W) -> (H, W, C)
             
-            status_msg = f"Success! Used prompt: {prompt}\nParameters: model_t={model_t}, coeff_t={coeff_t}, lora_rank={lora_rank}, patch_size={patch_size}\nEncode patch: {encode_patch_size}, Decode patch: {decode_patch_size}, Batch size: {batch_size}"
+            flash_status = "enabled" if use_flash_attention else "disabled"
+            status_msg = f"Success! Used prompt: {prompt}\nParameters: model_t={model_t}, coeff_t={coeff_t}, lora_rank={lora_rank}, patch_size={patch_size}\nEncode patch: {encode_patch_size}, Decode patch: {decode_patch_size}, Batch size: {batch_size}\nFlashAttention: {flash_status}"
             return_value = (output_image, status_msg)
         except Exception as e:
             print(f"HYPIR advanced restoration error: {e}")

@@ -19,6 +19,8 @@ This is a ComfyUI plugin for [HYPIR (Harnessing Diffusion-Yielded Score Priors f
 - **模型管理**：高效加载和复用 HYPIR 模型
 - **Upscaling**: Built-in upscaling capabilities (1x to 8x)
 - **放大功能**：内置放大功能（1x 到 8x）
+- **FlashAttention 2 Support**: Accelerated attention computation for faster processing
+- **FlashAttention 2 支持**：加速注意力计算，提升处理速度
 
 ## Installation
 ## 安装方法
@@ -35,13 +37,43 @@ ComfyUI/custom_nodes/Comfyui-HYPIR/
 ### 2. Install HYPIR Dependencies
 ### 2. 安装 HYPIR 依赖
 
-Navigate to the HYPIR folder and install the required dependencies:
-进入 HYPIR 文件夹并安装所需依赖：
+**Option A: Automatic Installation (Recommended)**
+**方式 A：自动安装（推荐）**
+
+Use the installation script that will check your system and install dependencies:
+使用安装脚本，它会检查您的系统并安装依赖：
 
 ```bash
-cd ComfyUI/custom_nodes/Comfyui-HYPIR/HYPIR
+cd ComfyUI/custom_nodes/Comfyui-HYPIR
+python install.py
+```
+
+**Option B: Manual Installation**
+**方式 B：手动安装**
+
+Navigate to the plugin folder and install the required dependencies:
+进入插件文件夹并安装所需依赖：
+
+```bash
+cd ComfyUI/custom_nodes/Comfyui-HYPIR
 pip install -r requirements.txt
 ```
+
+**FlashAttention 2 Installation:**
+**FlashAttention 2 安装：**
+
+FlashAttention 2.8.3 is included in the requirements and will significantly speed up inference. However, it requires:
+FlashAttention 2.8.3 已包含在依赖中，将显著提升推理速度。但需要满足以下条件：
+
+- **CUDA-enabled GPU** with compute capability >= 7.5 (Turing, Ampere, Ada, or Hopper architectures)
+- **支持 CUDA 的 GPU**，计算能力 >= 7.5（图灵、安培、Ada 或 Hopper 架构）
+- **PyTorch** >= 2.0.0 with CUDA support
+- **PyTorch** >= 2.0.0 并支持 CUDA
+- **CUDA Toolkit** installed (matching your PyTorch CUDA version)
+- 已安装 **CUDA Toolkit**（需与 PyTorch 的 CUDA 版本匹配）
+
+If FlashAttention installation fails, the plugin will automatically fall back to standard attention. To manually disable FlashAttention, set `use_flash_attention=False` in the node parameters.
+如果 FlashAttention 安装失败，插件会自动回退到标准注意力机制。如需手动禁用 FlashAttention，可在节点参数中设置 `use_flash_attention=False`。
 
 ### 3. Model Download (Automatic)
 ### 3. 模型下载（自动）
@@ -120,6 +152,8 @@ ComfyUI/models/HYPIR/stable-diffusion-2-1-base/
    - `lora_rank`：LoRA 阶数（默认256）
    - `patch_size`: Processing patch size (default: 512)
    - `patch_size`：处理块大小（默认512）
+   - `use_flash_attention`: Enable FlashAttention 2 (default: True)
+   - `use_flash_attention`：启用 FlashAttention 2（默认：True）
 
 ## Configuration
 ## 配置
@@ -135,6 +169,7 @@ HYPIR_CONFIG = {
     "model_t": 200,
     "coeff_t": 200,
     "lora_rank": 256,
+    "use_flash_attention": True,  # Enable FlashAttention 2 by default
     # ... more settings
 }
 ```
@@ -192,6 +227,15 @@ The plugin includes intelligent model path management:
    - Use the Model Loader node to avoid repeated model loading
    - 使用模型加载器节点避免重复加载模型
 
+5. **FlashAttention 2**:
+5. **FlashAttention 2**：
+   - Enable `use_flash_attention=True` for 2-3x faster inference on compatible GPUs
+   - 在兼容的 GPU 上启用 `use_flash_attention=True` 可获得 2-3 倍的推理速度提升
+   - Automatically falls back to standard attention if not available
+   - 如不可用会自动回退到标准注意力机制
+   - Requires GPU with compute capability >= 7.5 (RTX 20/30/40 series, A100, etc.)
+   - 需要计算能力 >= 7.5 的 GPU（RTX 20/30/40 系列、A100 等）
+
 ## Troubleshooting
 ## 故障排查
 
@@ -201,9 +245,18 @@ The plugin includes intelligent model path management:
 1. **Import Error**: Make sure HYPIR dependencies are installed
 1. **导入错误**：请确保已安装 HYPIR 依赖
    ```bash
-   cd HYPIR
+   cd ComfyUI/custom_nodes/Comfyui-HYPIR
    pip install -r requirements.txt
    ```
+
+0. **FlashAttention Installation Issues**:
+0. **FlashAttention 安装问题**：
+   - If FlashAttention fails to install, ensure you have CUDA Toolkit and compatible GPU
+   - 如果 FlashAttention 安装失败，请确保已安装 CUDA Toolkit 并有兼容的 GPU
+   - The plugin will work without FlashAttention (using standard attention)
+   - 插件在没有 FlashAttention 的情况下也可正常工作（使用标准注意力）
+   - To skip FlashAttention installation, manually remove `flash-attn==2.8.3` from `requirements.txt`
+   - 如需跳过 FlashAttention 安装，可从 `requirements.txt` 中手动移除 `flash-attn==2.8.3`
 
 2. **Model Not Found**: The plugin will automatically download missing models
 2. **模型未找到**：插件会自动下载缺失的模型

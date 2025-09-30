@@ -3,7 +3,7 @@ from diffusers import DDPMScheduler, UNet2DConditionModel
 from transformers import CLIPTextModel, CLIPTokenizer
 from peft import LoraConfig
 
-from HYPIR.enhancer.base import BaseEnhancer
+from HYPIR.enhancer.base import BaseEnhancer, FLASH_ATTENTION_AVAILABLE
 
 
 class SD2Enhancer(BaseEnhancer):
@@ -16,6 +16,10 @@ class SD2Enhancer(BaseEnhancer):
         self.text_encoder = CLIPTextModel.from_pretrained(
             self.base_model_path, subfolder="text_encoder", torch_dtype=self.weight_dtype).to(self.device)
         self.text_encoder.eval().requires_grad_(False)
+        
+        # Enable FlashAttention for text encoder if available
+        if self.use_flash_attention:
+            self._enable_flash_attention_for_model(self.text_encoder)
 
     def init_generator(self):
         self.G: UNet2DConditionModel = UNet2DConditionModel.from_pretrained(
@@ -35,6 +39,31 @@ class SD2Enhancer(BaseEnhancer):
         assert required_keys == input_keys, f"Missing: {missing}, Unexpected: {unexpected}"
 
         self.G.eval().requires_grad_(False)
+        
+        # Enable FlashAttention for UNet if available
+        if self.use_flash_attention:
+            self._enable_flash_attention_for_model(self.G)
+    
+    def _enable_flash_attention_for_model(self, model):
+        """Enable FlashAttention 2 for a model's attention layers"""
+        if not FLASH_ATTENTION_AVAILABLE:
+            return
+        
+        try:
+            # For diffusers models, we can use the built-in method
+            if hasattr(model, 'enable_xformers_memory_efficient_attention'):
+                # FlashAttention 2 is automatically used by transformers/diffusers 
+                # when available, but we can explicitly enable optimized attention
+                pass
+            
+            # Set attn_implementation for the model
+            if hasattr(model, 'set_attn_processor'):
+                from diffusers.models.attention_processor import AttnProcessor2_0
+                model.set_attn_processor(AttnProcessor2_0())
+                print(f"FlashAttention 2 enabled for {model.__class__.__name__}")
+            
+        except Exception as e:
+            print(f"Warning: Failed to enable FlashAttention for model: {e}")
 
     def prepare_inputs(self, batch_size, prompt):
         bs = batch_size

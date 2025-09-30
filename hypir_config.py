@@ -22,6 +22,7 @@ HYPIR_CONFIG = {
     ],
     "patch_size": 512,
     "vae_scale_factor": 8,
+    "use_flash_attention": True,  # Enable FlashAttention 2 by default
 }
 
 def get_default_weight_path():
