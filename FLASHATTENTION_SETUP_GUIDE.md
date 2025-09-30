@@ -10,7 +10,7 @@
 1. Open Command Prompt or PowerShell in the plugin directory:
 1. 在插件目录中打开命令提示符或 PowerShell：
    ```
-   cd ComfyUI\custom_nodes\Comfyui-HYPIR
+   cd ComfyUI\custom_nodes\Comfyui-HYPIR2
    ```
 
 2. Run the installation batch file:
@@ -25,7 +25,7 @@
 1. Open terminal in the plugin directory:
 1. 在插件目录中打开终端：
    ```
-   cd ComfyUI/custom_nodes/Comfyui-HYPIR
+   cd ComfyUI/custom_nodes/Comfyui-HYPIR2
    ```
 
 2. Make the script executable and run it:
@@ -81,6 +81,8 @@ This will:
 
 ## GPU Compatibility Check
 ## GPU 兼容性检查
+
+**Project Repository / 项目仓库**: [https://github.com/NeoColdman/Comfyui-HYPIR2](https://github.com/NeoColdman/Comfyui-HYPIR2)
 
 To quickly check if your GPU supports FlashAttention:
 快速检查您的 GPU 是否支持 FlashAttention：
@@ -241,8 +243,8 @@ If you encounter issues:
 3. 查看 [FLASHATTENTION.md](FLASHATTENTION.md) 获取详细文档
 4. Check [TROUBLESHOOTING](#common-installation-issues) section
 4. 查看[故障排查](#common-installation-issues)部分
-5. Report issues on GitHub with test script output
-5. 在 GitHub 上报告问题并附上测试脚本输出
+5. Report issues on [GitHub](https://github.com/NeoColdman/Comfyui-HYPIR2/issues) with test script output
+5. 在 [GitHub](https://github.com/NeoColdman/Comfyui-HYPIR2/issues) 上报告问题并附上测试脚本输出
 
 ## Additional Resources
 ## 其他资源

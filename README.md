@@ -1,10 +1,13 @@
-原项目地址https://github.com/XPixelGroup/HYPIR?tab=readme-ov-file
+**GitHub Repository / 仓库地址**: [https://github.com/NeoColdman/Comfyui-HYPIR2](https://github.com/NeoColdman/Comfyui-HYPIR2)
+
+**Original HYPIR Project / 原始 HYPIR 项目**: [https://github.com/XPixelGroup/HYPIR](https://github.com/XPixelGroup/HYPIR)
 
 # HYPIR ComfyUI Plugin
 # HYPIR ComfyUI 插件
 
-This is a ComfyUI plugin for [HYPIR (Harnessing Diffusion-Yielded Score Priors for Image Restoration)](https://github.com/XPixelGroup/HYPIR), a state-of-the-art image restoration model based on Stable Diffusion 2.1.
-这是一个用于 [HYPIR（利用扩散得分先验进行图像修复）](https://github.com/XPixelGroup/HYPIR) 的 ComfyUI 插件，HYPIR 是基于 Stable Diffusion 2.1 的先进图像修复模型。
+This is a ComfyUI plugin for [HYPIR (Harnessing Diffusion-Yielded Score Priors for Image Restoration)](https://github.com/XPixelGroup/HYPIR), a state-of-the-art image restoration model based on Stable Diffusion 2.1. This enhanced version includes FlashAttention 2 support for 2-3x faster inference.
+
+这是一个用于 [HYPIR（利用扩散得分先验进行图像修复）](https://github.com/XPixelGroup/HYPIR) 的 ComfyUI 插件，HYPIR 是基于 Stable Diffusion 2.1 的先进图像修复模型。此增强版本包含 FlashAttention 2 支持，可实现 2-3 倍推理速度提升。
 
 ## Features
 ## 功能特性
@@ -28,10 +31,22 @@ This is a ComfyUI plugin for [HYPIR (Harnessing Diffusion-Yielded Score Priors f
 ### 1. Install the Plugin
 ### 1. 安装插件
 
-Place this folder in your ComfyUI `custom_nodes` directory:
-将本文件夹放入 ComfyUI 的 `custom_nodes` 目录下：
+**Option A: Git Clone (Recommended)**
+**方式 A：Git 克隆（推荐）**
+
+```bash
+cd ComfyUI/custom_nodes/
+git clone https://github.com/NeoColdman/Comfyui-HYPIR2.git
+cd Comfyui-HYPIR2
 ```
-ComfyUI/custom_nodes/Comfyui-HYPIR/
+
+**Option B: Manual Download**
+**方式 B：手动下载**
+
+Download and extract this repository to your ComfyUI `custom_nodes` directory:
+下载并解压本仓库到 ComfyUI 的 `custom_nodes` 目录：
+```
+ComfyUI/custom_nodes/Comfyui-HYPIR2/
 ```
 
 ### 2. Install HYPIR Dependencies
@@ -44,7 +59,7 @@ Use the installation script that will check your system and install dependencies
 使用安装脚本，它会检查您的系统并安装依赖：
 
 ```bash
-cd ComfyUI/custom_nodes/Comfyui-HYPIR
+cd ComfyUI/custom_nodes/Comfyui-HYPIR2
 python install.py
 ```
 
@@ -55,7 +70,7 @@ Navigate to the plugin folder and install the required dependencies:
 进入插件文件夹并安装所需依赖：
 
 ```bash
-cd ComfyUI/custom_nodes/Comfyui-HYPIR
+cd ComfyUI/custom_nodes/Comfyui-HYPIR2
 pip install -r requirements.txt
 ```
 
@@ -245,7 +260,7 @@ The plugin includes intelligent model path management:
 1. **Import Error**: Make sure HYPIR dependencies are installed
 1. **导入错误**：请确保已安装 HYPIR 依赖
    ```bash
-   cd ComfyUI/custom_nodes/Comfyui-HYPIR
+   cd ComfyUI/custom_nodes/Comfyui-HYPIR2
    pip install -r requirements.txt
    ```
 
@@ -314,11 +329,22 @@ This plugin is provided under the same license as the original HYPIR project. Pl
 ## Support
 ## 支持
 
-For issues related to this ComfyUI plugin, please check:
-如遇本插件相关问题，请参考：
-1. This README for troubleshooting
-1. 本 README 故障排查部分
-2. The original [HYPIR repository](https://github.com/XPixelGroup/HYPIR) for model-specific issues
-2. 原 [HYPIR 仓库](https://github.com/XPixelGroup/HYPIR) 以获取模型相关问题
-3. ComfyUI documentation for general ComfyUI questions 
-3. ComfyUI 文档以了解通用 ComfyUI 问题 
+For issues related to this ComfyUI plugin, please:
+如遇本插件相关问题，请：
+
+1. **Check Documentation / 查看文档**:
+   - This README for troubleshooting / 本 README 故障排查部分
+   - [FLASHATTENTION.md](FLASHATTENTION.md) for FlashAttention details / FlashAttention 详细信息
+   - [FLASHATTENTION_SETUP_GUIDE.md](FLASHATTENTION_SETUP_GUIDE.md) for setup guide / 设置指南
+
+2. **Report Issues / 报告问题**:
+   - Open an issue on [GitHub](https://github.com/NeoColdman/Comfyui-HYPIR2/issues)
+   - 在 [GitHub](https://github.com/NeoColdman/Comfyui-HYPIR2/issues) 上提交问题
+
+3. **Original HYPIR Project / 原始 HYPIR 项目**:
+   - The original [HYPIR repository](https://github.com/XPixelGroup/HYPIR) for model-specific issues
+   - 原 [HYPIR 仓库](https://github.com/XPixelGroup/HYPIR) 以获取模型相关问题
+
+4. **ComfyUI Community / ComfyUI 社区**:
+   - ComfyUI documentation for general ComfyUI questions
+   - ComfyUI 文档以了解通用 ComfyUI 问题 
